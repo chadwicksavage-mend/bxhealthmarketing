@@ -1,0 +1,132 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, stripHtml } from '../../lib/wordpress';
+
+const page = parseInt(Astro.url.searchParams.get('page') || '1', 10);
+const perPage = 20;
+
+const { posts, totalPages, total } = await getPosts({ perPage, page });
+---
+
+<Base title="Archive" description="All posts from BX Health Marketing.">
+  <div class="archive container container--narrow">
+    <header class="archive-header">
+      <h1 class="archive-title">Archive</h1>
+      <p class="archive-count">{total} posts</p>
+    </header>
+
+    {posts.length > 0 ? (
+      <div class="posts-list">
+        {posts.map((post) => (
+          <PostCard
+            title={stripHtml(post.title.rendered)}
+            slug={post.slug}
+            date={post.date}
+            excerpt={post.excerpt.rendered}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state">
+        <p>No posts found.</p>
+      </div>
+    )}
+
+    {totalPages > 1 && (
+      <nav class="pagination" aria-label="Pagination">
+        {page > 1 && (
+          <a href={`/blog?page=${page - 1}`} class="pagination-link prev">
+            &larr; Newer posts
+          </a>
+        )}
+        <span class="pagination-info">
+          Page {page} of {totalPages}
+        </span>
+        {page < totalPages && (
+          <a href={`/blog?page=${page + 1}`} class="pagination-link next">
+            Older posts &rarr;
+          </a>
+        )}
+      </nav>
+    )}
+  </div>
+</Base>
+
+<style>
+  .archive {
+    padding-block: var(--space-8);
+  }
+
+  .container--narrow {
+    max-width: var(--max-width-wide);
+  }
+
+  .archive-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-2);
+  }
+
+  .archive-title {
+    font-size: var(--text-3xl);
+  }
+
+  .archive-count {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .empty-state {
+    padding-block: var(--space-16);
+    text-align: center;
+    color: var(--color-ink-muted);
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+  }
+
+  .pagination-link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-poppy);
+  }
+
+  .pagination-link:hover {
+    color: var(--color-poppy-dark);
+  }
+
+  .pagination-link.prev {
+    margin-right: auto;
+  }
+
+  .pagination-link.next {
+    margin-left: auto;
+  }
+
+  .pagination-info {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  @media (min-width: 768px) {
+    .archive {
+      padding-block: var(--space-12);
+    }
+  }
+</style>

@@ -1,0 +1,114 @@
+---
+import { formatDate, truncateExcerpt } from '../lib/wordpress';
+
+interface Props {
+  title: string;
+  slug: string;
+  date: string;
+  excerpt: string;
+  variant?: 'default' | 'featured' | 'compact';
+}
+
+const {
+  title,
+  slug,
+  date,
+  excerpt,
+  variant = 'default'
+} = Astro.props;
+---
+
+<article class:list={['post-card', `post-card--${variant}`]}>
+  <a href={`/blog/${slug}`} class="post-link">
+    <time class="post-date" datetime={date}>
+      {formatDate(date)}
+    </time>
+    <h3 class="post-title">{title}</h3>
+    {variant !== 'compact' && (
+      <p class="post-excerpt">{truncateExcerpt(excerpt, variant === 'featured' ? 240 : 140)}</p>
+    )}
+  </a>
+</article>
+
+<style>
+  .post-card {
+    position: relative;
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-card:last-child {
+    border-bottom: none;
+  }
+
+  .post-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-date {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-poppy);
+    margin-bottom: var(--space-2);
+  }
+
+  .post-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-2);
+    transition: color var(--transition-fast);
+  }
+
+  .post-link:hover .post-title {
+    color: var(--color-poppy);
+  }
+
+  .post-excerpt {
+    font-size: var(--text-sm);
+    color: var(--color-ink-light);
+    line-height: var(--leading-normal);
+    margin: 0;
+  }
+
+  /* Featured variant - larger text, more presence */
+  .post-card--featured {
+    padding-block: var(--space-8);
+    border-bottom: none;
+  }
+
+  .post-card--featured .post-title {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .post-card--featured .post-excerpt {
+    font-size: var(--text-base);
+    max-width: 40rem;
+  }
+
+  /* Compact variant - tighter spacing */
+  .post-card--compact {
+    padding-block: var(--space-4);
+  }
+
+  .post-card--compact .post-title {
+    font-size: var(--text-lg);
+  }
+
+  @media (min-width: 768px) {
+    .post-card--featured .post-title {
+      font-size: var(--text-4xl);
+    }
+
+    .post-card--featured .post-excerpt {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

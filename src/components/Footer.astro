@@ -1,0 +1,101 @@
+---
+import NewsletterSignup from './NewsletterSignup.astro';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer-inner container">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <span class="footer-logo">BX</span>
+        <span class="footer-name">Health Marketing</span>
+      </div>
+      <p class="tagline">
+        Marketing <span class="x">&times;</span> Behavioral Health
+      </p>
+    </div>
+    <div class="footer-newsletter">
+      <NewsletterSignup variant="footer" />
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <p class="copyright">
+      &copy; {currentYear} BX Health Marketing
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-ink);
+    margin-top: var(--space-16);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    padding-block: var(--space-12);
+  }
+
+  .footer-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .footer-logo {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    color: var(--color-poppy);
+  }
+
+  .footer-name {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-white);
+  }
+
+  .tagline {
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+
+  .x {
+    color: var(--color-poppy);
+  }
+
+  .footer-newsletter {
+    max-width: 24rem;
+  }
+
+  .footer-bottom {
+    padding-block: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .copyright {
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+  }
+</style>

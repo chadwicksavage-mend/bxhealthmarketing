@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPosts, stripHtml } from '../lib/wordpress';
+
+const { posts } = await getPosts({ perPage: 10 });
+
+const featuredPost = posts[0];
+const recentPosts = posts.slice(1);
+---
+
+<Base title="BX Health Marketing">
+  <div class="home">
+    {/* Hero - Featured Post */}
+    {featuredPost && (
+      <section class="hero">
+        <div class="container container--narrow">
+          <PostCard
+            title={stripHtml(featuredPost.title.rendered)}
+            slug={featuredPost.slug}
+            date={featuredPost.date}
+            excerpt={featuredPost.excerpt.rendered}
+            variant="featured"
+          />
+        </div>
+      </section>
+    )}
+
+    {/* Recent Posts */}
+    {recentPosts.length > 0 && (
+      <section class="recent-section">
+        <div class="container container--narrow">
+          <div class="section-header">
+            <h2 class="section-heading">Recent</h2>
+            <a href="/blog" class="view-all-link">View Archive</a>
+          </div>
+          <div class="posts-list">
+            {recentPosts.map((post) => (
+              <PostCard
+                title={stripHtml(post.title.rendered)}
+                slug={post.slug}
+                date={post.date}
+                excerpt={post.excerpt.rendered}
+                variant="default"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {posts.length === 0 && (
+      <section class="empty-state container">
+        <p>No posts yet. Check back soon.</p>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .home {
+    padding-bottom: var(--space-16);
+  }
+
+  .container--narrow {
+    max-width: var(--max-width-wide);
+  }
+
+  /* Hero */
+  .hero {
+    padding-block: var(--space-10);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Recent Section */
+  .recent-section {
+    padding-top: var(--space-10);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-heading {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+
+  .view-all-link {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-poppy);
+  }
+
+  .view-all-link:hover {
+    color: var(--color-poppy-dark);
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .empty-state {
+    padding-block: var(--space-20);
+    text-align: center;
+    color: var(--color-ink-muted);
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      padding-block: var(--space-16);
+    }
+  }
+</style>

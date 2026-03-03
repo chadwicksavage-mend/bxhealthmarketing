@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found">
+  <div class="not-found container">
+    <h1>404</h1>
+    <p>Page not found.</p>
+    <a href="/">Back to home</a>
+  </div>
+</Base>
+
+<style>
+  .not-found {
+    padding-block: var(--space-20);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-4);
+  }
+
+  p {
+    color: var(--color-ink-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  a {
+    font-weight: 500;
+  }
+</style>

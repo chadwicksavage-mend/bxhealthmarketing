@@ -1,0 +1,143 @@
+---
+import Base from '../../layouts/Base.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import { getAllPosts, getPostBySlug, formatDate, stripHtml, truncateExcerpt } from '../../lib/wordpress';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const title = stripHtml(post.title.rendered);
+const description = truncateExcerpt(post.excerpt.rendered, 155);
+---
+
+<Base title={title} description={description}>
+  <article class="post container">
+    <header class="post-header">
+      <time class="post-date meta" datetime={post.date}>
+        {formatDate(post.date)}
+      </time>
+      <h1 class="post-title">{title}</h1>
+    </header>
+
+    <div class="post-content prose" set:html={post.content.rendered} />
+
+    <NewsletterSignup />
+
+    <footer class="post-footer">
+      <a href="/blog" class="back-link">&larr; Back to archive</a>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  .post {
+    padding-block: var(--space-8);
+  }
+
+  .post-header {
+    max-width: var(--max-width-content);
+    margin-bottom: var(--space-10);
+  }
+
+  .post-date {
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  .post-title {
+    font-size: var(--text-4xl);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .post-content {
+    /* prose class handles most styling */
+  }
+
+  /* Additional content styling for WP output */
+  .post-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  .post-content :global(figure) {
+    margin-block: var(--space-8);
+  }
+
+  .post-content :global(figcaption) {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  .post-content :global(pre) {
+    background: var(--color-paper-warm);
+    padding: var(--space-4);
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: var(--text-sm);
+  }
+
+  .post-content :global(code) {
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .post-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-block: var(--space-6);
+  }
+
+  .post-content :global(th),
+  .post-content :global(td) {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  .post-content :global(th) {
+    font-weight: 600;
+  }
+
+  .post-footer {
+    max-width: var(--max-width-content);
+    padding-top: var(--space-10);
+    margin-top: var(--space-10);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-poppy);
+  }
+
+  .back-link:hover {
+    color: var(--color-poppy-dark);
+  }
+
+  @media (min-width: 768px) {
+    .post {
+      padding-block: var(--space-12);
+    }
+
+    .post-title {
+      font-size: var(--text-5xl);
+    }
+  }
+</style>
