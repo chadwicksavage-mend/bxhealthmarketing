@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Schema from '../components/Schema.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPosts, stripHtml } from '../lib/wordpress';
 
@@ -7,14 +8,75 @@ const { posts } = await getPosts({ perPage: 10 });
 
 const featuredPost = posts[0];
 const recentPosts = posts.slice(1);
+
+// Schema.org data
+const siteUrl = 'https://bxhealthmarketing.com';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'BX Health Marketing',
+  url: siteUrl,
+  description: 'Industry commentary at the intersection of marketing and behavioral health.',
+};
+
+const webSiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'BX Health Marketing',
+  url: siteUrl,
+  description: 'Industry commentary at the intersection of marketing and behavioral health.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'BX Health Marketing',
+  },
+};
 ---
 
 <Base title="BX Health Marketing">
+  <Schema slot="head" schema={[organizationSchema, webSiteSchema]} />
   <div class="home">
-    {/* Hero - Featured Post */}
+    {/* Hero - Newsletter CTA */}
+    <section class="hero">
+      <div class="container hero-container">
+        <h1 class="hero-headline">Where marketing meets behavioral health</h1>
+        <p class="hero-subheadline">For marketers navigating behavioral health's shifting landscape</p>
+        <form
+          name="newsletter-hero"
+          method="POST"
+          action="/thank-you"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          class="hero-form"
+        >
+          <input type="hidden" name="form-name" value="newsletter-hero" />
+          <p class="hidden">
+            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+          <div class="hero-form-row">
+            <label for="hero-email" class="sr-only">Email address</label>
+            <input
+              type="email"
+              name="email"
+              id="hero-email"
+              placeholder="you@example.com"
+              required
+              class="hero-input"
+            />
+            <button type="submit" class="hero-button">Subscribe</button>
+          </div>
+          <p class="hero-note">Weekly insights. No spam.</p>
+        </form>
+      </div>
+    </section>
+
+    {/* Latest Post */}
     {featuredPost && (
-      <section class="hero">
+      <section class="latest-section">
         <div class="container container--narrow">
+          <div class="section-header">
+            <h2 class="section-heading">Latest</h2>
+          </div>
           <PostCard
             title={stripHtml(featuredPost.title.rendered)}
             slug={featuredPost.slug}
@@ -68,8 +130,125 @@ const recentPosts = posts.slice(1);
 
   /* Hero */
   .hero {
-    padding-block: var(--space-10);
+    padding-block: var(--space-16) var(--space-12);
     border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-white);
+  }
+
+  .hero-container {
+    max-width: 38rem;
+    text-align: center;
+  }
+
+  .hero-headline {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    color: var(--color-ink);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-subheadline {
+    font-size: var(--text-lg);
+    color: var(--color-ink-light);
+    margin-bottom: var(--space-8);
+  }
+
+  .hero-form {
+    max-width: 28rem;
+    margin-inline: auto;
+  }
+
+  .hero-form-row {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .hero-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .hero-input::placeholder {
+    color: var(--color-ink-muted);
+  }
+
+  .hero-input:focus {
+    outline: none;
+    border-color: var(--color-poppy);
+    box-shadow: 0 0 0 3px rgba(229, 91, 60, 0.1);
+  }
+
+  .hero-button {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-white);
+    background-color: var(--color-poppy);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .hero-button:hover {
+    background-color: var(--color-poppy-dark);
+  }
+
+  .hero-note {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    margin-top: var(--space-3);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding-block: var(--space-20) var(--space-16);
+    }
+
+    .hero-headline {
+      font-size: var(--text-4xl);
+    }
+
+    .hero-subheadline {
+      font-size: var(--text-xl);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      padding-block: var(--space-24) var(--space-20);
+    }
+
+    .hero-headline {
+      font-size: var(--text-5xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-form-row {
+      flex-direction: column;
+    }
+
+    .hero-button {
+      width: 100%;
+    }
+  }
+
+  /* Latest Section */
+  .latest-section {
+    padding-top: var(--space-10);
   }
 
   /* Recent Section */
@@ -117,11 +296,5 @@ const recentPosts = posts.slice(1);
     padding-block: var(--space-20);
     text-align: center;
     color: var(--color-ink-muted);
-  }
-
-  @media (min-width: 1024px) {
-    .hero {
-      padding-block: var(--space-16);
-    }
   }
 </style>

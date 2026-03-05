@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Schema from '../../components/Schema.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getAllPosts, getPostBySlug, formatDate, stripHtml, truncateExcerpt } from '../../lib/wordpress';
 
@@ -20,9 +21,80 @@ if (!post) {
 
 const title = stripHtml(post.title.rendered);
 const description = truncateExcerpt(post.excerpt.rendered, 155);
+
+// Get featured image if available
+const featuredImage = post._embedded?.['wp:featuredmedia']?.[0];
+const ogImage = featuredImage?.source_url;
+
+// Schema.org data
+const siteUrl = 'https://bxhealthmarketing.com';
+const postUrl = `${siteUrl}/blog/${slug}`;
+
+const blogPostingSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: description,
+  url: postUrl,
+  datePublished: post.date,
+  dateModified: post.modified,
+  author: {
+    '@type': 'Organization',
+    name: 'BX Health Marketing',
+    url: siteUrl,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'BX Health Marketing',
+    url: siteUrl,
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': postUrl,
+  },
+  ...(ogImage && {
+    image: {
+      '@type': 'ImageObject',
+      url: ogImage,
+    },
+  }),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: siteUrl,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Blog',
+      item: `${siteUrl}/blog`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: title,
+      item: postUrl,
+    },
+  ],
+};
 ---
 
-<Base title={title} description={description}>
+<Base
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  ogType="article"
+  publishedTime={post.date}
+  modifiedTime={post.modified}
+>
+  <Schema slot="head" schema={[blogPostingSchema, breadcrumbSchema]} />
   <article class="post container">
     <header class="post-header">
       <time class="post-date meta" datetime={post.date}>
